@@ -36,19 +36,23 @@ const regions=[
 
 async function loadPokemon(){
 
-const res=await fetch("https://pokeapi.co/api/v2/pokemon?limit=1025");
+pokemonList = [];
 
-const data=await res.json();
+for(let i = 1; i <= 1025; i++){
 
-pokemonList=data.results.map((p,index)=>({
+const res = await fetch(`https://pokeapi.co/api/v2/pokemon-species/${i}`);
+const data = await res.json();
 
-name:p.name,
-id:index+1
+const frenchName = data.names.find(n => n.language.name === "fr").name;
 
-}));
+pokemonList.push({
+id:i,
+name:frenchName.toLowerCase()
+});
+
+}
 
 drawGrid();
-
 updateStats();
 
 }
