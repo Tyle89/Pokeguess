@@ -91,7 +91,7 @@ function drawGrid() {
         div.appendChild(img);
 
         const num = document.createElement("div");
-        num.textContent = "#" + p.id;
+        num.innerHTML = `#${p.id} <span style="font-size:0.9em;">${p.name.includes("♀") ? "♀" : p.name.includes("♂") ? "♂" : ""}</span>`;
         div.appendChild(num);
 
         grid.appendChild(div);
@@ -104,35 +104,68 @@ document.getElementById("guessBtn").addEventListener("click", async () => {
 
     const guess = normalizeName(rawGuess);
 
-    const pokemon = pokemonList.find(p => normalizeName(p.name) === guess);
+    let pokemon = pokemonList.find(p => normalizeName(p.name) === guess);
+
+    // Gestion spéciale Nidoran – on vérifie ça SEULEMENT si pas trouvé normalement
+    if (!pokemon && guess.includes("nidoran")) {
+        const lowerRaw = rawGuess.toLowerCase();  // on utilise la version originale (avec accents possibles)
+
+        // On détecte femelle en priorité
+        if (
+            lowerRaw.includes("♀") ||
+            lowerRaw.includes("femelle") ||
+            lowerRaw.includes("female") ||
+            lowerRaw.includes("f") && (lowerRaw.includes("nidoranf") || lowerRaw.endsWith(" f"))
+        ) {
+            pokemon = pokemonList.find(p => p.id === 29); // Nidoran♀
+        }
+        // Puis mâle
+        else if (
+            lowerRaw.includes("♂") ||
+            lowerRaw.includes("male") ||
+            lowerRaw.includes("mâle") ||
+            lowerRaw.includes("m") && (lowerRaw.includes("nidoranm") || lowerRaw.endsWith(" m"))
+        ) {
+            pokemon = pokemonList.find(p => p.id === 32); // Nidoran♂
+        }
+        // Si juste "nidoran" ou "nidoran quelque chose" sans précision
+        else {
+            message.textContent = "Nidoran mâle ♂ ou femelle ♀ ? Précise avec 'nidoran♂' ou 'nidoran♀' !";
+            input.focus();
+            return;
+        }
+    }
 
     if (!pokemon) {
         message.textContent = "Ce Pokémon n'existe pas (ou mauvaise orthographe)";
         return;
     }
 
+    // Maintenant pokemon est défini → on peut utiliser pokemon.name en sécurité
     const originalName = pokemon.name;
 
     if (foundPokemon.includes(originalName)) {
-        message.textContent = "Déjà trouvé";
+        message.textContent = "Déjà trouvé !";
         return;
     }
 
     foundPokemon.push(originalName);
     localStorage.setItem("foundPokemon", JSON.stringify(foundPokemon));
+
     message.textContent = `Pokémon trouvé ! (${pokemon.name})`;
 
     playCry(pokemon.id);
     showEvolution(pokemon.id);
 
-    drawGrid();         
+    drawGrid();
     updateStats();
 
+    // Scroll + highlight
     const pokemonElement = document.getElementById(`pokemon-${pokemon.id}`);
     if (pokemonElement) {
         pokemonElement.scrollIntoView({ 
             behavior: "smooth", 
-            block: "center",  
+            block: "center",    
             inline: "nearest" 
         });
 
