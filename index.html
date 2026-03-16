@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pokédex Challenge</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+
+  <body>
+    <div class="pokedex">
+      <div class="left">
+        <h1>Pokédex</h1>
+
+        <div class="led"></div>
+
+        <div class="screen">
+          <div id="message"></div>
+          <div id="hint"></div>
+        </div>
+
+        <div class="controls">
+          <input id="pokemonInput" placeholder="Nom du Pokémon" />
+
+          <button id="guessBtn">Valider</button>
+          <button id="hintBtn">Indice</button>
+        </div>
+
+        <div class="progress">
+          <div id="progressBar"></div>
+        </div>
+
+        <p>Trouvés : <span id="found">0</span> / 1025</p>
+
+        <div id="regions"></div>
+
+        <div id="achievements"></div>
+      </div>
+
+      <div class="right">
+        <div id="pokedexGrid"></div>
+
+        <div id="evolution"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
