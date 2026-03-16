@@ -72,36 +72,30 @@ updateStats();
 
 }
 
-function drawGrid(){
+function drawGrid() {
+    grid.innerHTML = "";
 
-grid.innerHTML="";
+    pokemonList.forEach(p => {
+        const div = document.createElement("div");
+        div.classList.add("pokemon");
+        
+        div.id = `pokemon-${p.id}`;           
 
-pokemonList.forEach(p=>{
+        const img = document.createElement("img");
+        img.src = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`;
 
-const div=document.createElement("div");
+        if (!foundPokemon.includes(p.name)) {
+            img.classList.add("silhouette");
+        }
 
-div.classList.add("pokemon");
+        div.appendChild(img);
 
-const img=document.createElement("img");
+        const num = document.createElement("div");
+        num.textContent = "#" + p.id;
+        div.appendChild(num);
 
-img.src=`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${p.id}.png`;
-
-if(!foundPokemon.includes(p.name)){
-img.classList.add("silhouette");
-}
-
-div.appendChild(img);
-
-const num=document.createElement("div");
-
-num.textContent="#"+p.id;
-
-div.appendChild(num);
-
-grid.appendChild(div);
-
-});
-
+        grid.appendChild(div);
+    });
 }
 
 document.getElementById("guessBtn").addEventListener("click", async () => {
@@ -126,15 +120,30 @@ document.getElementById("guessBtn").addEventListener("click", async () => {
 
     foundPokemon.push(originalName);
     localStorage.setItem("foundPokemon", JSON.stringify(foundPokemon));
-
     message.textContent = `Pokémon trouvé ! (${pokemon.name})`;
+
     playCry(pokemon.id);
     showEvolution(pokemon.id);
-    drawGrid();
+
+    drawGrid();         
     updateStats();
 
+    const pokemonElement = document.getElementById(`pokemon-${pokemon.id}`);
+    if (pokemonElement) {
+        pokemonElement.scrollIntoView({ 
+            behavior: "smooth", 
+            block: "center",  
+            inline: "nearest" 
+        });
+
+        pokemonElement.classList.add("highlight-new");
+        setTimeout(() => {
+            pokemonElement.classList.remove("highlight-new");
+        }, 2000);
+    }
+
     input.value = "";
-    input.focus();        
+    input.focus();
 });
 
 function updateStats(){

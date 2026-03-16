@@ -103,6 +103,15 @@ border-radius:10px;
 text-align:center;
 padding:5px;
 font-size:10px;
+transition: all 0.4s ease;
+}
+
+.pokemon.highlight-new {
+    box-shadow: 0 0 20px 8px rgba(255, 215, 0, 0.7); 
+    transform: scale(1.12);
+    z-index: 10;
+    background: rgba(255, 255, 200, 0.25);
+    border-radius: 12px;
 }
 
 .pokemon img{
