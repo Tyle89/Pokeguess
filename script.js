@@ -34,6 +34,21 @@ const regions=[
 
 ];
 
+function normalizeName(str) {
+    return str
+        .normalize("NFD")                  
+        .replace(/[\u0300-\u036f]/g, "")   
+        .toLowerCase()
+        .trim();
+}
+
+input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") {
+        e.preventDefault();           
+        document.getElementById("guessBtn").click();  
+    }
+});
+
 async function loadPokemon(){
 
 pokemonList = [];
@@ -89,42 +104,37 @@ grid.appendChild(div);
 
 }
 
-document.getElementById("guessBtn").addEventListener("click",async ()=>{
+document.getElementById("guessBtn").addEventListener("click", async () => {
+    const rawGuess = input.value.trim();
+    if (!rawGuess) return;
 
-const guess=input.value.toLowerCase().trim();
+    const guess = normalizeName(rawGuess);
 
-const pokemon=pokemonList.find(p=>p.name===guess);
+    const pokemon = pokemonList.find(p => normalizeName(p.name) === guess);
 
-if(!pokemon){
+    if (!pokemon) {
+        message.textContent = "Ce Pokémon n'existe pas (ou mauvaise orthographe)";
+        return;
+    }
 
-message.textContent="Ce Pokémon n'existe pas";
-return;
+    const originalName = pokemon.name;
 
-}
+    if (foundPokemon.includes(originalName)) {
+        message.textContent = "Déjà trouvé";
+        return;
+    }
 
-if(foundPokemon.includes(guess)){
+    foundPokemon.push(originalName);
+    localStorage.setItem("foundPokemon", JSON.stringify(foundPokemon));
 
-message.textContent="Déjà trouvé";
-return;
+    message.textContent = `Pokémon trouvé ! (${pokemon.name})`;
+    playCry(pokemon.id);
+    showEvolution(pokemon.id);
+    drawGrid();
+    updateStats();
 
-}
-
-foundPokemon.push(guess);
-
-localStorage.setItem("foundPokemon",JSON.stringify(foundPokemon));
-
-message.textContent="Pokémon trouvé !";
-
-playCry(pokemon.id);
-
-showEvolution(pokemon.id);
-
-drawGrid();
-
-updateStats();
-
-input.value="";
-
+    input.value = "";
+    input.focus();        
 });
 
 function updateStats(){
